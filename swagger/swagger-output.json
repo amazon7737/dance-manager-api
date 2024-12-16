@@ -107,6 +107,96 @@
           }
         }
       }
+    },
+    "/test-link": {
+      "get": {
+        "tags": ["테스트"],
+        "description": "테스트 영상링크 조회",
+        "responses": {
+          "200": {
+            "description": "성공",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/test-video": {
+      "post": {
+        "tags": ["테스트"],
+        "description": "테스트 비디오 등록",
+        "parameters": [
+          {
+            "name": "link",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "link": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/move": {
+      "post": {
+        "tags": ["이동"],
+        "description": "이동 비디오 등록",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "step": {
+                  "type": "string"
+                },
+                "th": {
+                  "type": "string"
+                },
+                "link": {
+                  "type": "string"
+                },
+                "move_name": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
     }
   }
 }

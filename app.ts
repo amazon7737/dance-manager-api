@@ -1,8 +1,11 @@
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import * as dotenv from "dotenv";
-import indexRouter from "./routes/music_controller";
+import indexRouter from "./routes/api_controller";
 import adminRouter from "./routes/admin_controller";
+
+var session = require("express-session");
+
 const app = express();
 
 // API 문서
@@ -13,8 +16,20 @@ dotenv.config();
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs"); // 템플릿 엔진 설정
+
+app.use(
+  session({
+    secret: "45678()(*&*&",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { user_id: "" },
+  })
+);
+
+app.use(express.json()); // JSON 본문 파싱을 활성화
+app.use(express.urlencoded({ extended: true })); // 22
 app.use("/", indexRouter);
-app.use("/admin", adminRouter);
+app.use("/", adminRouter);
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(swaggerFile, { explorer: true }));
 
 app.listen(8001, () => {
