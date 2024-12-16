@@ -27,7 +27,7 @@
             type="text"
             id="artist-input"
             class="form-control"
-            name="artist"
+            name="singer"
             placeholder="가수 이름을 입력해주세요"
           />
         </div>
@@ -35,7 +35,7 @@
         <div class="mb-3">
           <select
             class="form-select"
-            name="genre"
+            name="category"
             id="genre-select"
           >
             <option value="" disabled selected>장르를 선택해주세요</option>
@@ -68,11 +68,10 @@
                   <td><%= musics[i].singer %></td>
                   <td><%= musics[i].category %></td>
                   <td>
-                    <form action="/music/edit" method="get" class="d-inline">
-                      <input type="hidden" name="id" value="<%= musics[i]._id %>">
+                    <form action="/edit/<%= musics[i].id %>" method="get" class="d-inline">
                       <button class="btn btn-warning btn-sm me-1">수정</button>
                     </form>
-                    <form action="/music/delete/<%= musics[i]._id %>" method="get" class="d-inline">
+                    <form action="/delete/<%= musics[i].id %>" method="get" class="d-inline">
                       <button class="btn btn-danger btn-sm">삭제</button>
                     </form>
                   </td>
@@ -82,6 +81,92 @@
           </table>
         </div>
       </div>
+    </div>
+
+    <div class="container mt-5">
+      <h2 class="mb-4">동작 리스트</h2>
+      <table class="table table-hover">
+    <thead class="table-white">
+      <tr>
+        <th scope="col">노래번호</th>
+        <th scope="col">단계/영상</th>
+        <th scope="col">동작이름</th>
+        <th scope="col">관리</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for(let i=0; i< videos.length; i++) { %>
+        <tr>
+          <td><%= videos[i].music_id %></td>
+          <td><%= videos[i].step %> 단계 / <%= videos[i].th %> 번째 영상</td>
+          <td><%= videos[i].move_name %> </td>
+          <td>
+            <form action="/video/edit/<%= videos[i].id %>" method="get" class="d-inline">
+              <button class="btn btn-warning btn-sm me-1">수정</button>
+            </form>
+            <form action="/video/delete/<%= videos[i].id %>" method="get" class="d-inline">
+              <button class="btn btn-danger btn-sm">삭제</button>
+            </form>
+              <a href = "<%= videos[i].link %>" class="btn btn-primary">영상보러가기</a>
+            </form>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+    </table>  
+    </div>
+
+    <div class="container mt-5">
+      <h2 class="mb-4">동작 추가</h2>
+      <form action="/move" method="post">
+        <div class="mb-3">
+          <input
+            type="text"
+            id="video-id-input"
+            class="form-control"
+            name="name"
+            placeholder="노래이름를 입력해주세요"
+          />
+        </div>
+        <div class="mb-3">
+          <input
+            type="text"
+            id="step-input"
+            class="form-control"
+            name="step"
+            placeholder="단계를 입력해주세요"
+          />
+        </div>
+        <div class="mb-3">
+          <input
+            type="text"
+            id="th-input"
+            class="form-control"
+            name="th"
+            placeholder="파트번호를 입력해주세요"
+          />
+        </div>
+        <div class="mb-3">
+          <input
+            type="text"
+            id="th-input"
+            class="form-control"
+            name="move_name"
+            placeholder="동작이름를 입력해주세요"
+          />
+        </div>
+        <div class="mb-3">
+
+          <input
+            type="text"
+            id="th-input"
+            class="form-control"
+            name="link"
+            placeholder="링크를 입력해주세요"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">추가하기</button>
+      </form>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
