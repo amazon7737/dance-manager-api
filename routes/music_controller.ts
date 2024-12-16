@@ -48,4 +48,18 @@ router.get(
   }
 );
 
+router.get(
+  "/test-link",
+  async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.log("------ 테스트 영상링크 조회 -------");
+    try {
+      const data = await music_repository.selectMusicVideo();
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error });
+    }
+  }
+);
+
 export default router;
