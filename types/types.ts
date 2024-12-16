@@ -4,3 +4,9 @@ export interface Music {
   category: string;
   singer: string;
 }
+
+export interface Video {
+  id: number;
+  link: string;
+  created_at: string;
+}
