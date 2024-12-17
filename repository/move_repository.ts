@@ -10,7 +10,11 @@ const pool = createClient(supabase_url, supabase_key);
 
 const selectMoveJoinMusic = async () => {
   try {
-    const response = await pool.from("music_video").select(`id, link, music_list (name)`);
+    const response = await pool
+      .from("music_video")
+      .select(`id, link, music_list (name)`)
+      .order("music_id", { ascending: false });
+
     return response.data;
   } catch (error) {
     throw new Error();
