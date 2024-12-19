@@ -1,7 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
 import * as dotenv from "dotenv";
-import { Music, Video } from "../types/types";
-import { Interface } from "readline";
 
 dotenv.config();
 const supabase_url = process.env.SUPABASE_URL || "";
@@ -9,7 +7,8 @@ const supabase_key = process.env.SUPABASE_KEY || "";
 const pool = createClient(supabase_url, supabase_key);
 
 // music_id 를 기준으로 재정렬하여 music_list의 name을 가지고 select
-const selectMoveJoinMusic = async () => {
+// selectMoveJoinMusic
+const selectMusicVideoWithMusicIdOrderByDesc = async () => {
   try {
     const response = await pool
       .from("music_video")
@@ -23,7 +22,8 @@ const selectMoveJoinMusic = async () => {
 };
 
 // music_list 의 name을 가지고 오는 music_video에 고유 id 값을 select
-const selectById = async (id: number) => {
+// selectById
+const selectMusicVideoById = async (id: number) => {
   const data = await pool
     .from("music_video")
     .select(`id, link, music_id, move_name, step, th, music_list (name)`)
@@ -34,6 +34,17 @@ const selectById = async (id: number) => {
   return data.data;
 };
 
+// selectMusicByMusicId
+const selectMusicByMusicId = async (id: number) => {
+  try {
+    const data = await pool.from("music_video").select().eq("music_id", id);
+    return data.data;
+  } catch (error) {
+    throw new Error();
+  }
+};
+
+// selectByMusicId
 const selectByMusicId = async (id: number) => {
   const data = await pool
     .from("music_video")
@@ -46,6 +57,7 @@ const selectByMusicId = async (id: number) => {
 };
 
 // music_id, step, th 를 가지고 music_video select
+// selectByStepAndTh
 const selectByStepAndTh = async (music_id: number, step: number, th: number) => {
   const data = await pool
     .from("music_video")
@@ -59,4 +71,10 @@ const selectByStepAndTh = async (music_id: number, step: number, th: number) => 
   return data.data;
 };
 
-export default { selectMoveJoinMusic, selectById, selectByStepAndTh, selectByMusicId };
+export default {
+  selectMusicVideoWithMusicIdOrderByDesc,
+  selectMusicVideoById,
+  selectByStepAndTh,
+  selectByMusicId,
+  selectMusicByMusicId,
+};
