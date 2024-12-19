@@ -27,7 +27,7 @@
             </tr>
           </thead>
           <tbody>
-            <form action="/video/edit" method="post" class="d-inline">
+            <form action="/video/edit" method="post" class="d-inline" enctype="multipart/form-data">
               <tr>
                 <td>
                   <input type="hidden" name="id" value="<%= videos[0].id %>" />
@@ -74,6 +74,16 @@
                     value="<%= videos[0].link %>"
                   />
                 </td>
+
+                <td>
+                  <input
+                    type="file"
+                    name="video"
+                    id="video"
+                    class="form-control"
+                    onchange="onChange()"
+                  />
+                </td>
                 <td>
                   <button class="btn btn-warning btn-sm me-1">수정완료</button>
                 </td>
@@ -84,5 +94,16 @@
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- <script type="text/javascript">
+      let target = document.getElementById("link");
+
+      function onChange() {
+        let name = document.getElementById("video").value;
+
+        let input = name.split("\\").pop();
+        target.value = input;
+      }
+    </script> -->
   </body>
 </html>
