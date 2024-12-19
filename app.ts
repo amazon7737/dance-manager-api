@@ -1,7 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import * as dotenv from "dotenv";
-import indexRouter from "./routes/api_controller";
+import apiRouter from "./routes/api_controller";
 import adminRouter from "./routes/admin_controller";
 
 var session = require("express-session");
@@ -28,7 +28,7 @@ app.use(
 
 app.use(express.json()); // JSON 본문 파싱을 활성화
 app.use(express.urlencoded({ extended: true })); // 22
-app.use("/", indexRouter);
+app.use("/api/v1", apiRouter);
 app.use("/", adminRouter);
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(swaggerFile, { explorer: true }));
 
