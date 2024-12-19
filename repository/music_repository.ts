@@ -9,11 +9,11 @@ const pool = createClient(supabase_url, supabase_key);
 
 const selectAllMusicList = async () => {
   const data = await pool.from("music_list").select().returns<Music[]>();
-  // console.log("-------음악 전체 조회 요청 ------", data);
   return data.data;
 };
 
-const selectById = async (id: number) => {
+// selectById
+const selectMusicById = async (id: number) => {
   const data = await pool.from("music_list").select().eq("id", id).returns<Music[]>();
   return data.data;
 };
@@ -27,7 +27,6 @@ const selectByName = async (name: string) => {
 
 const selectMusicListByCategory = async (category: string) => {
   const data = await pool.from("music_list").select().eq("category", category).returns<Music[]>();
-  // console.log(category, "-------카테고리 별 음악 조회 요청 ------", data);
   return data;
 };
 
@@ -38,17 +37,16 @@ const selectMusicVideo = async () => {
       .select()
       .returns<Video[]>()
       .order("music_id", { ascending: true });
-    // console.log(data.data);
     return data.data;
   } catch (error) {
     throw new Error();
   }
 };
 
-const selectMusicById = async (id: number) => {
+// selectMusicById
+const selectMusicByMusicId = async (id: number) => {
   try {
     const data = await pool.from("music_video").select().eq("music_id", id);
-    // console.log(data.data);
     return data.data;
   } catch (error) {
     throw new Error();
@@ -59,7 +57,7 @@ export default {
   selectAllMusicList,
   selectMusicListByCategory,
   selectMusicVideo,
-  selectById,
   selectByName,
   selectMusicById,
+  selectMusicByMusicId,
 };

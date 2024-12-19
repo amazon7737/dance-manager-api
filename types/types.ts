@@ -1,5 +1,3 @@
-import session from "express-session";
-
 export interface Music {
   id: number;
   name: string;

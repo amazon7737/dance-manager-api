@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as dotenv from "dotenv";
 import music_repository from "../repository/music_repository";
+import move_repository from "../repository/music_video_repository";
 
 dotenv.config();
 const router = express.Router();
@@ -9,7 +10,7 @@ router.get("/", async (req: express.Request, res: express.Response, next: expres
   const response = {
     status: 200,
     message: "안녕하세요 댄스매니저 API를 서빙해주고 있어요 ^ㅁ^",
-    data: "https://swagger....",
+    data: "https://146.56.110.45.sslip.io/swagger-ui",
   };
 
   res.status(200).json(response);
@@ -47,11 +48,29 @@ router.get(
 );
 
 router.get(
-  "/step/:music_id",
+  "/music/step/:music_id",
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const id: number = Number(req.params.music_id);
+
     try {
-      const data = await music_repository.selectMusicById(id);
+      const data = await move_repository.selectByMusicId(id);
+
+      res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error });
+    }
+  }
+);
+
+router.get(
+  "/music/detail/:music_id/:step/:th",
+  async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const id: number = Number(req.params.music_id);
+    const step: number = Number(req.params.step);
+    const th: number = Number(req.params.th);
+    try {
+      const data = await move_repository.selectByStepAndTh(id, step, th);
       res.status(200).json(data);
     } catch (error) {
       console.error(error);
@@ -60,17 +79,4 @@ router.get(
   }
 );
 
-router.get(
-  "/test-link",
-  async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.log("------ 테스트 영상링크 조회 -------");
-    try {
-      const data = await music_repository.selectMusicVideo();
-      res.status(200).json(data);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: error });
-    }
-  }
-);
 export default router;
