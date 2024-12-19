@@ -19,7 +19,7 @@ export const findAll = async (table: string) => {
   }
 };
 
-export const findById = async (table: string, condition: string, id: number, type: T) => {
+export const findById = async (table: string, condition: string, id: number) => {
   try {
     const response = await pool.from(table).select().eq(condition, id);
 
