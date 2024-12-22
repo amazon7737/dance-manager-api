@@ -1,4 +1,4 @@
-export const send_message = (message: string, action: string) => {
+export const message_handler = (message: string, action: string) => {
   return `<script type = "text/javascript">alert("${message}"); ${action}</script>`;
 };
 
