@@ -6,6 +6,7 @@ import { deleteObjectFromS3, imageUploader } from "../amazon_s3/imageUploader";
 import multer from "multer";
 import { findById, findAll, save, update, deleteById } from "../repository/crud_repository";
 import music_detail_repository from "../repository/music_video_repository";
+import { error_handler, send_message } from "../util/message-broker";
 
 dotenv.config();
 
@@ -19,9 +20,7 @@ router.get(
     console.log(req.session.user_id);
 
     if (req.session.user_id === "" || req.session.user_id === undefined) {
-      res.send(
-        `<script type = "text/javascript">alert("로그인 화면으로 이동합니다."); location.href = "/admin/login";</script>`
-      );
+      res.send(send_message("로그인 화면으로 이동합니다.", "location.href = '/admin/login'"));
     }
     const list = await music_repository.selectAllMusicList();
     const videos = await music_repository.selectMusicVideo();
@@ -46,9 +45,9 @@ router.post(
     if (id === "equal" && password === "1234") {
       req.session.user_id = "equal";
 
-      res.send(
-        `<script type = "text/javascript">alert("환영합니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("환영합니다.", "location.href = '/admin'"));
+    } else {
+      res.send(send_message("아이디 및 비밀번호를 확인해주세요", "window.history.back();"));
     }
   }
 );
@@ -74,14 +73,10 @@ router.post(
       const fileName = `${req.file?.originalname}`;
       await imageUploader(fileName, fileBuffer);
 
-      res.send(
-        `<script type = "text/javascript">alert("정상적으로 등록되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("정상적으로 등록되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("문제가 발생했습니다. 담당자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -106,26 +101,25 @@ router.post(
       const data = (await music_detail_repository.selectMusicVideoById(id)) ?? [];
 
       const url = "https://d26sqqgq7qsm80.cloudfront.net/";
+      console.log(req.file);
 
-      await deleteObjectFromS3(data[0].link.split("/").pop());
+      let fileName = "";
 
-      const fileBuffer: Buffer = req.file!.buffer;
-      const fileName = `${req.file?.originalname}`;
-
-      await imageUploader(fileName, fileBuffer);
+      if (req.file !== undefined) {
+        await deleteObjectFromS3(data[0].link.split("/").pop());
+        const fileBuffer: Buffer = req.file!.buffer;
+        fileName = `${req.file?.originalname}`;
+        await imageUploader(fileName, fileBuffer);
+      }
 
       await update("music_video", id, [
         { music_id: music_id, step: step, th: th, link: url + fileName, move_name: move_name },
       ]);
 
-      res.send(
-        `<script type = "text/javascript">alert("수정이 완료되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("수정이 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("수정에 문제가 발생했습니다. 담장자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -137,19 +131,13 @@ router.get(
     try {
       const video = (await music_detail_repository.selectMusicVideoById(Number(id))) ?? [];
       console.log(video);
-
       await deleteObjectFromS3(video[0].link.split("/").pop());
-
       await deleteById("music_video", Number(id));
 
-      res.send(
-        `<script type = "text/javascript">alert("삭제가 완료되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("삭제가 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("삭제중 문제가 발생했습니다. 담장자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -161,17 +149,11 @@ router.post(
     console.log(title, category, singer);
 
     try {
-      // let data: string[] = [{name: title, category: category, singer: singer}];
       await save("music_list", [{ name: title, category: category, singer: singer }]);
-      // await music_repository.insert_music(title, category, singer);
-      res.send(
-        `<script type = "text/javascript">alert("정상적으로 등록되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("정상적으로 등록되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("문제가 발생했습니다. 담당자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -180,10 +162,12 @@ router.get(
   "/music/edit/:id",
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const id: number = Number(req.params.id);
-    const data = await music_detail_repository.selectMusicByMusicId(id);
+    console.log(id);
+
+    const data = await music_repository.selectMusicById(id);
     console.log(data);
 
-    res.render("music_edit", { music: data });
+    res.render("music_edit", { music: data, id: id });
   }
 );
 
@@ -194,15 +178,10 @@ router.post(
     console.log(name, singer, category);
     try {
       await update("music_list", id, [{ name: name, singer: singer, category: category }]);
-
-      res.send(
-        `<script type = "text/javascript">alert("수정이 완료되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("수정이 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("수정에 문제가 발생했습니다. 담장자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -213,14 +192,10 @@ router.get(
     const id = req.params.id;
     try {
       await deleteById("music_list", Number(id));
-      res.send(
-        `<script type = "text/javascript">alert("삭제가 완료되었습니다."); location.href = "/admin";</script>`
-      );
+      res.send(send_message("삭제가 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
-      res.send(
-        `<script type = "text/javascript">alert("삭제중 문제가 발생했습니다. 담장자에게 문의해주세요. ${error}"); window.history.back();</script>`
-      );
+      res.send(error_handler(String(error)));
     }
   }
 );
@@ -229,7 +204,6 @@ router.post(
   "/test-video",
   async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let { link } = req.body;
-
     res.render("video", { link: String(link) });
   }
 );
