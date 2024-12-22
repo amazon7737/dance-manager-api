@@ -6,7 +6,7 @@ import { deleteObjectFromS3, imageUploader } from "../amazon_s3/imageUploader";
 import multer from "multer";
 import { findById, findAll, save, update, deleteById } from "../repository/crud_repository";
 import music_detail_repository from "../repository/music_video_repository";
-import { error_handler, send_message } from "../util/message-broker";
+import { error_handler, message_handler } from "../util/message-broker";
 
 dotenv.config();
 
@@ -20,7 +20,7 @@ router.get(
     console.log(req.session.user_id);
 
     if (req.session.user_id === "" || req.session.user_id === undefined) {
-      res.send(send_message("로그인 화면으로 이동합니다.", "location.href = '/admin/login'"));
+      res.send(message_handler("로그인 화면으로 이동합니다.", "location.href = '/admin/login'"));
     }
     const list = await music_repository.selectAllMusicList();
     const videos = await music_repository.selectMusicVideo();
@@ -45,9 +45,9 @@ router.post(
     if (id === "equal" && password === "1234") {
       req.session.user_id = "equal";
 
-      res.send(send_message("환영합니다.", "location.href = '/admin'"));
+      res.send(message_handler("환영합니다.", "location.href = '/admin'"));
     } else {
-      res.send(send_message("아이디 및 비밀번호를 확인해주세요", "window.history.back();"));
+      res.send(message_handler("아이디 및 비밀번호를 확인해주세요", "window.history.back();"));
     }
   }
 );
@@ -73,7 +73,7 @@ router.post(
       const fileName = `${req.file?.originalname}`;
       await imageUploader(fileName, fileBuffer);
 
-      res.send(send_message("정상적으로 등록되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("정상적으로 등록되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
@@ -116,7 +116,7 @@ router.post(
         { music_id: music_id, step: step, th: th, link: url + fileName, move_name: move_name },
       ]);
 
-      res.send(send_message("수정이 완료되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("수정이 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
@@ -134,7 +134,7 @@ router.get(
       await deleteObjectFromS3(video[0].link.split("/").pop());
       await deleteById("music_video", Number(id));
 
-      res.send(send_message("삭제가 완료되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("삭제가 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
@@ -150,7 +150,7 @@ router.post(
 
     try {
       await save("music_list", [{ name: title, category: category, singer: singer }]);
-      res.send(send_message("정상적으로 등록되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("정상적으로 등록되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
@@ -178,7 +178,7 @@ router.post(
     console.log(name, singer, category);
     try {
       await update("music_list", id, [{ name: name, singer: singer, category: category }]);
-      res.send(send_message("수정이 완료되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("수정이 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
@@ -192,7 +192,7 @@ router.get(
     const id = req.params.id;
     try {
       await deleteById("music_list", Number(id));
-      res.send(send_message("삭제가 완료되었습니다.", "location.href = '/admin'"));
+      res.send(message_handler("삭제가 완료되었습니다.", "location.href = '/admin'"));
     } catch (error) {
       console.error(error);
       res.send(error_handler(String(error)));
